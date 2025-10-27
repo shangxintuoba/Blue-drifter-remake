@@ -5,13 +5,15 @@ using UnityEngine;
 public class Gun : MonoBehaviour
 {
     public Bulletcase Bulletcaseprefab;
+    public Bullet Bulletprefab;
+    
     public Transform Firepoint;
     public Transform Casepoint;
 
-    public float MaxDistance = 20f;
-    public LayerMask ShootableObjects;
-    public LineRenderer BulletTrail;
+    public float Shotrate = 0.3f;
+    public int bulletnumber = 6;
 
+    public float bulletspeed = 300f;
 
     private void Start()
     {
@@ -20,38 +22,24 @@ public class Gun : MonoBehaviour
 
     public void Update()
     {
-        Fire();
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Debug.Log("fire");
+            Fire();
+        }
     }
 
     public void Fire()
     {
-        if (Input.GetMouseButton(0))
-        {
-            RaycastHit hitInfo;
-            bool hit = Physics.Raycast(Firepoint.position, Firepoint.forward, out hitInfo, MaxDistance, ShootableObjects);
-            if (hit)
-            {
-                DrawBulletTrail(hitInfo.point);
-            }
-            else
-            {
-                DrawBulletTrail(Firepoint.position + Firepoint.forward * MaxDistance);
-
-            }
-            Instantiate(Bulletcaseprefab, Casepoint.position, Quaternion.identity);
-            //BulletTrail.enabled = true;
-
-        }
-        else
-        {
-            //BulletTrail.enabled = false;
-        }
+        Instantiate(Bulletcaseprefab, Casepoint.position, Quaternion.identity);
+        Rigidbody rb = Instantiate(Bulletprefab, Firepoint.position, Quaternion.identity).GetComponent<Rigidbody>();
+        rb.linearVelocity = transform.forward * bulletspeed;
     }
 
-    private void DrawBulletTrail(Vector3 hitpoint)
+    public void Reload()
     {
-        BulletTrail.SetPosition(0, hitpoint - Firepoint.forward * 20f);
-        BulletTrail.SetPosition(1, hitpoint);
-    }
 
+
+    }
 }

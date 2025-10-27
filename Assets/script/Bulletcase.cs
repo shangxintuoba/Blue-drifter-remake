@@ -2,15 +2,15 @@ using UnityEngine;
 
 public class Bulletcase : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public float speed = 2f;
+    private Rigidbody rb;
+
+    void Awake()
     {
-        
+        gameObject.transform.rotation = Quaternion.Euler(90, 0, 0);
+        rb = GetComponent<Rigidbody>();
+        rb.AddForce(new Vector3(1, Random.Range(0.3f, 1f), 0)* speed* Random.Range(0.5f, 1f), ForceMode.Impulse);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
 }
