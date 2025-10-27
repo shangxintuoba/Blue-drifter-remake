@@ -2,11 +2,14 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    public GameObject testcube;
 
     private void OnCollisionEnter(Collision collision)
     {
 
-        Debug.DrawLine(new Vector3(0,0,0),transform.position,Color.red);
+        Instantiate(testcube, gameObject.transform.position, Quaternion.identity);
+        Destroy(gameObject);
+
     }
 
 }

@@ -125,6 +125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 2
+  Gun: {fileID: 8226732100967535814, guid: 4762e453ce30ad94a8b3527f0da4d379, type: 3}
 --- !u!54 &4998502326630757028
 Rigidbody:
   m_ObjectHideFlags: 0
