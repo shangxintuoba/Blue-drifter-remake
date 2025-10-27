@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Net;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -11,10 +12,12 @@ public class Gun : MonoBehaviour
     public Transform Casepoint;
 
     public float Shotrate = 1f;
-    public float ShotrateTimer;
+    private float ShotrateTimer;
     public int bulletnumber = 6;
+    private int bulletmagnumber;
 
     public float bulletspeed = 300f;
+    public float reloadtime = 1.5f;
 
 
 
@@ -25,31 +28,47 @@ public class Gun : MonoBehaviour
     private void Start()
     {
         ShotrateTimer = Shotrate;
+        bulletmagnumber =bulletnumber;
     }
 
     public void Update()
     {
+        //check shotrate
         if(ShotrateTimer>0) ShotrateTimer -= Time.deltaTime;
-
-        if (Input.GetMouseButtonDown(0) && ShotrateTimer<=0)
+        //fire
+        if (Input.GetMouseButtonDown(0) && ShotrateTimer <= 0)
         {
-            ShotrateTimer = Shotrate;
-            Fire();
+            if (bulletmagnumber > 0) //bullet mag
+            {
+                ShotrateTimer = Shotrate;
+                Fire();
+                bulletmagnumber--;
+
+            }
+        }
+        //reload
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            StartCoroutine(Reload());
         }
     }
 
     public void Fire()
     {
+        //bulletcase
         Instantiate(Bulletcaseprefab, Casepoint.position, Quaternion.identity);
+
+        //bullet
         Rigidbody rb = Instantiate(Bulletprefab, Firepoint.position, Quaternion.identity).GetComponent<Rigidbody>();
         rb.linearVelocity = transform.forward * bulletspeed;
         BulletcaseNumber++;
 
     }
 
-    public void Reload()
+    IEnumerator Reload()
     {
-        
-
+        //reload animation
+        yield return new WaitForSeconds(reloadtime);
+        bulletmagnumber = bulletnumber;
     }
 }
