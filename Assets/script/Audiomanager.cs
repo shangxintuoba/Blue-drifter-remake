@@ -2,15 +2,32 @@ using UnityEngine;
 
 public class Audiomanager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public AudioClip Gunshot;
+    public AudioClip Reload;
+    public AudioClip Walkingstep;
+    public AudioClip Dash;
+
+
+    public AudioClip Rain;
+    public AudioClip BGM;
+
+    public AudioSource BGMPlayer;
+    public AudioSource RainPlayer;
+
+    public static Audiomanager Instance { get; private set; }
+
+    private void Awake()
     {
-        
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject); 
+            return;
+        }
+
+        Instance = this;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
+
+
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Net;
 using Unity.VisualScripting;
 using UnityEngine;
+using Cinemachine;
 
 public class Gun : MonoBehaviour
 {
@@ -23,12 +24,25 @@ public class Gun : MonoBehaviour
 
     //bulletcase count 
     public int BulletcaseNumber =0;
-    
+
+
+    //aim & Reload
+    private Vector3 initialPosition;
+    public Animator Animator;
+    public float AimoffsetY;
+    public float AimoffsetZ;
+    private bool isReloading;
+
+    //cameara shake
+    public CinemachineImpulseSource Impulse;
+
 
     private void Start()
     {
         ShotrateTimer = Shotrate;
-        bulletmagnumber =bulletnumber;
+        bulletmagnumber = bulletnumber;
+        initialPosition = transform.localPosition;
+
     }
 
     public void Update()
@@ -51,6 +65,10 @@ public class Gun : MonoBehaviour
         {
             StartCoroutine(Reload());
         }
+
+
+        Aim();
+       
     }
 
     public void Fire()
@@ -58,17 +76,28 @@ public class Gun : MonoBehaviour
         //bulletcase
         Instantiate(Bulletcaseprefab, Casepoint.position, Quaternion.identity);
 
+
         //bullet
         Rigidbody rb = Instantiate(Bulletprefab, Firepoint.position, Quaternion.identity).GetComponent<Rigidbody>();
         rb.linearVelocity = transform.forward * bulletspeed;
         BulletcaseNumber++;
+        Impulse.GenerateImpulse();
 
     }
 
     IEnumerator Reload()
     {
+        isReloading = true;
         //reload animation
         yield return new WaitForSeconds(reloadtime);
         bulletmagnumber = bulletnumber;
+        isReloading = false;
+        Animator.SetBool("isReloading", false);
+    }
+
+    public void Aim()
+    {
+       Animator.SetBool("isAiming", (Input.GetMouseButton(1) && !isReloading));
+       
     }
 }
