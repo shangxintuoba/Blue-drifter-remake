@@ -4,7 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using Cinemachine;
 
-public class Gun : MonoBehaviour
+public class GunAndArm : MonoBehaviour
 {
     public Bulletcase Bulletcaseprefab;
     public Bullet Bulletprefab;
@@ -25,6 +25,8 @@ public class Gun : MonoBehaviour
     //cameara shake
     public CinemachineImpulseSource Impulse;
 
+    //Aim Charger
+    private float charger = 0;
 
     public Animator Animator;
 
@@ -33,9 +35,10 @@ public class Gun : MonoBehaviour
         Idle,
         Reloading,
         Aiming,
-        Charging,
     }
     public State Currentstate;
+
+
 
 
     private void Start()
@@ -43,19 +46,19 @@ public class Gun : MonoBehaviour
         bulletmagnumber = bulletnumber;
         Currentstate = State.Idle;
 
+
     }
 
     public void Update()
     {
         Aim();
-        Charge();
         Reload();
+        
     }
-
 
     public void Reload()
     {
-        if (Input.GetKeyDown(KeyCode.R) && (Currentstate != State.Charging || Currentstate != State.Reloading))
+        if (Input.GetKeyDown(KeyCode.R) && Currentstate != State.Reloading)
         {
             Animator.SetBool("isReloading", true);
             bulletmagnumber = bulletnumber;
@@ -71,44 +74,23 @@ public class Gun : MonoBehaviour
 
     public void Aim()
     {
-        if(Input.GetMouseButtonDown(1)&& Currentstate !=State.Reloading)
+        if(Input.GetMouseButton(1)&& Currentstate !=State.Reloading)
         {
-            if (Currentstate == State.Aiming)
-            {
-                Currentstate = State.Idle;
-                Animator.SetBool("isAiming", false);
-                return;
-            }            
-            else
-            {
-                Currentstate = State.Aiming;
-                Animator.SetBool("isAiming", true);
-                return;
-            }
+            charger += Time.deltaTime *10f;
         }
+        else
+        {
+            charger -= Time.deltaTime * 10f;
+        }
+
+        charger = Mathf.Clamp(charger, 0, 1);
+        Animator.SetFloat("AimingTime", charger);
     }
 
 
     public void Charge()
     {
 
-        if (Input.GetMouseButtonDown(0) && Currentstate == State.Aiming)
-        {
-            if (bulletmagnumber > 0) 
-            {
-                Animator.SetBool("isCharging", true);
-                Currentstate = State.Charging;
-            }
-        }
-        else if (Input.GetMouseButtonUp(0) && Currentstate == State.Charging)
-        {
-            if (bulletmagnumber > 0) 
-            {               
-                Fire();
-                Animator.SetBool("Shooting", true);
-
-            }
-        }
     }
 
     public void Fire()
