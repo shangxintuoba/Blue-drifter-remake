@@ -12,63 +12,103 @@ public class Gun : MonoBehaviour
     public Transform Firepoint;
     public Transform Casepoint;
 
-    public float Shotrate = 1f;
-    private float ShotrateTimer;
+
     public int bulletnumber = 6;
     private int bulletmagnumber;
 
     public float bulletspeed = 300f;
     public float reloadtime = 1.5f;
 
-
-
     //bulletcase count 
     public int BulletcaseNumber =0;
-
-
-    //aim & Reload
-    private Vector3 initialPosition;
-    public Animator Animator;
-    public float AimoffsetY;
-    public float AimoffsetZ;
-    private bool isReloading;
 
     //cameara shake
     public CinemachineImpulseSource Impulse;
 
 
+    public Animator Animator;
+
+    public enum State
+    {
+        Idle,
+        Reloading,
+        Aiming,
+        Charging,
+    }
+    public State Currentstate;
+
+
     private void Start()
     {
-        ShotrateTimer = Shotrate;
         bulletmagnumber = bulletnumber;
-        initialPosition = transform.localPosition;
+        Currentstate = State.Idle;
 
     }
 
     public void Update()
     {
-        //check shotrate
-        if(ShotrateTimer>0) ShotrateTimer -= Time.deltaTime;
-        //fire
-        if (Input.GetMouseButtonDown(0) && ShotrateTimer <= 0)
+        Aim();
+        Charge();
+        Reload();
+    }
+
+
+    public void Reload()
+    {
+        if (Input.GetKeyDown(KeyCode.R) && (Currentstate != State.Charging || Currentstate != State.Reloading))
         {
-            if (bulletmagnumber > 0) //bullet mag
+            Animator.SetBool("isReloading", true);
+            bulletmagnumber = bulletnumber;
+            Currentstate = State.Reloading;
+        }
+    }
+
+    public void FinishReload()
+    {
+        Animator.SetBool("isReloading", false);
+        Currentstate = State.Idle;
+    }
+
+    public void Aim()
+    {
+        if(Input.GetMouseButtonDown(1)&& Currentstate !=State.Reloading)
+        {
+            if (Currentstate == State.Aiming)
             {
-                ShotrateTimer = Shotrate;
+                Currentstate = State.Idle;
+                Animator.SetBool("isAiming", false);
+                return;
+            }            
+            else
+            {
+                Currentstate = State.Aiming;
+                Animator.SetBool("isAiming", true);
+                return;
+            }
+        }
+    }
+
+
+    public void Charge()
+    {
+
+        if (Input.GetMouseButtonDown(0) && Currentstate == State.Aiming)
+        {
+            if (bulletmagnumber > 0) 
+            {
+                Animator.SetBool("isCharging", true);
+                Currentstate = State.Charging;
+            }
+        }
+        else if (Input.GetMouseButtonUp(0) && Currentstate == State.Charging)
+        {
+            if (bulletmagnumber > 0) 
+            {               
                 Fire();
-                bulletmagnumber--;
+                Animator.SetBool("Shooting", true);
 
             }
         }
-        //reload
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            StartCoroutine(Reload());
-        }
-
-
-        Aim();
-       
     }
 
     public void Fire()
@@ -76,28 +116,19 @@ public class Gun : MonoBehaviour
         //bulletcase
         Instantiate(Bulletcaseprefab, Casepoint.position, Quaternion.identity);
 
-
         //bullet
         Rigidbody rb = Instantiate(Bulletprefab, Firepoint.position, Quaternion.identity).GetComponent<Rigidbody>();
         rb.linearVelocity = transform.forward * bulletspeed;
         BulletcaseNumber++;
+        bulletmagnumber--;
         Impulse.GenerateImpulse();
 
     }
 
-    IEnumerator Reload()
+    public void ResetShooingbool()
     {
-        isReloading = true;
-        //reload animation
-        yield return new WaitForSeconds(reloadtime);
-        bulletmagnumber = bulletnumber;
-        isReloading = false;
-        Animator.SetBool("isReloading", false);
-    }
-
-    public void Aim()
-    {
-       Animator.SetBool("isAiming", (Input.GetMouseButton(1) && !isReloading));
-       
+        Animator.SetBool("Shooting", false);
+        Currentstate = State.Aiming;
+        Animator.SetBool("isCharging", false);
     }
 }
