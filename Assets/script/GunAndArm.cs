@@ -13,11 +13,11 @@ public class GunAndArm : MonoBehaviour
     public Transform Casepoint;
 
 
-    public int bulletnumber = 6;
-    private int bulletmagnumber;
+    public int bulletnumber = 12;
+    private int currentbulletnumber;
 
     public float bulletspeed = 300f;
-    public float reloadtime = 1.5f;
+    //public float reloadtime = 1.5f;
 
     //bulletcase count 
     public int BulletcaseNumber =0;
@@ -43,7 +43,7 @@ public class GunAndArm : MonoBehaviour
 
     private void Start()
     {
-        bulletmagnumber = bulletnumber;
+        currentbulletnumber = bulletnumber;
         Currentstate = State.Idle;
 
 
@@ -53,7 +53,9 @@ public class GunAndArm : MonoBehaviour
     {
         Aim();
         Reload();
-        
+        Fire();
+        HandleRunningAnimation();
+
     }
 
     public void Reload()
@@ -61,7 +63,7 @@ public class GunAndArm : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R) && Currentstate != State.Reloading)
         {
             Animator.SetBool("isReloading", true);
-            bulletmagnumber = bulletnumber;
+            currentbulletnumber = bulletnumber;
             Currentstate = State.Reloading;
         }
     }
@@ -77,10 +79,12 @@ public class GunAndArm : MonoBehaviour
         if(Input.GetMouseButton(1)&& Currentstate !=State.Reloading)
         {
             charger += Time.deltaTime *10f;
+            Currentstate = State.Aiming;
         }
         else
         {
             charger -= Time.deltaTime * 10f;
+            Currentstate = State.Idle;
         }
 
         charger = Mathf.Clamp(charger, 0, 1);
@@ -88,22 +92,20 @@ public class GunAndArm : MonoBehaviour
     }
 
 
-    public void Charge()
-    {
-
-    }
-
     public void Fire()
     {
+        if (Input.GetMouseButtonDown(0) /*&& Currentstate == State.Aiming*/ && currentbulletnumber>0)
+        { 
         //bulletcase
         Instantiate(Bulletcaseprefab, Casepoint.position, Quaternion.identity);
 
         //bullet
-        Rigidbody rb = Instantiate(Bulletprefab, Firepoint.position, Quaternion.identity).GetComponent<Rigidbody>();
-        rb.linearVelocity = transform.forward * bulletspeed;
+        Rigidbody rb = Instantiate(Bulletprefab, Firepoint.position, Firepoint.rotation).GetComponent<Rigidbody>();
+        rb.linearVelocity = Firepoint.forward * bulletspeed;
         BulletcaseNumber++;
-        bulletmagnumber--;
+        currentbulletnumber--;
         Impulse.GenerateImpulse();
+        }
 
     }
 
@@ -112,5 +114,11 @@ public class GunAndArm : MonoBehaviour
         Animator.SetBool("Shooting", false);
         Currentstate = State.Aiming;
         Animator.SetBool("isCharging", false);
+    }
+
+    public void HandleRunningAnimation()
+    {
+
+
     }
 }
