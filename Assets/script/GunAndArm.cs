@@ -29,6 +29,8 @@ public class GunAndArm : MonoBehaviour
     private float charger = 0;
 
     public Animator Animator;
+    //run animation lerp timer
+    private float T = 0;
 
     public enum State
     {
@@ -118,6 +120,22 @@ public class GunAndArm : MonoBehaviour
 
     public void HandleRunningAnimation()
     {
+        if (Input.GetKey(KeyCode.W)|| Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
+        {
+            T += 10f * Time.deltaTime;
+            T = Mathf.Clamp01(T);
+            Animator.SetFloat("RunningSpeed",Mathf.Lerp(0,1,T));
+
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                Animator.SetFloat("RunningSpeed", Mathf.Lerp(0, 2, T));
+            }
+        }
+        else
+        {
+            T = 0;
+        }
+
 
 
     }
