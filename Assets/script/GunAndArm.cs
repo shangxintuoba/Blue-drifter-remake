@@ -17,7 +17,8 @@ public class GunAndArm : MonoBehaviour
     private int currentbulletnumber;
 
     public float bulletspeed = 300f;
-    //public float reloadtime = 1.5f;
+    public float shotrate = 0.5f;
+    private float shotratetimer;
 
     //bulletcase count 
     public int BulletcaseNumber =0;
@@ -30,24 +31,19 @@ public class GunAndArm : MonoBehaviour
 
     public Animator Animator;
     //run animation lerp timer
-    private float T = 0;
-
-    public enum State
-    {
-        Idle,
-        Reloading,
-        Aiming,
-    }
-    public State Currentstate;
+    private float targetspeed =0;
 
 
+    private bool isAiming;
+    private bool isReloading;
 
+    //Hitchcock
+    private bool isPointingEnemy;
+    
 
     private void Start()
     {
         currentbulletnumber = bulletnumber;
-        Currentstate = State.Idle;
-
 
     }
 
@@ -57,36 +53,36 @@ public class GunAndArm : MonoBehaviour
         Reload();
         Fire();
         HandleRunningAnimation();
-
     }
 
     public void Reload()
     {
-        if (Input.GetKeyDown(KeyCode.R) && Currentstate != State.Reloading)
+        if (Input.GetKeyDown(KeyCode.R) && !isReloading)
         {
             Animator.SetBool("isReloading", true);
             currentbulletnumber = bulletnumber;
-            Currentstate = State.Reloading;
+            isReloading =true;
         }
     }
 
     public void FinishReload()
     {
         Animator.SetBool("isReloading", false);
-        Currentstate = State.Idle;
+        isReloading = false;
     }
 
     public void Aim()
     {
-        if(Input.GetMouseButton(1)&& Currentstate !=State.Reloading)
+        if(Input.GetMouseButton(1)&& !isReloading)
         {
             charger += Time.deltaTime *10f;
-            Currentstate = State.Aiming;
+            DetectEnemy();
+            isAiming = true;
         }
         else
         {
             charger -= Time.deltaTime * 10f;
-            Currentstate = State.Idle;
+            isAiming = false;
         }
 
         charger = Mathf.Clamp(charger, 0, 1);
@@ -96,47 +92,50 @@ public class GunAndArm : MonoBehaviour
 
     public void Fire()
     {
-        if (Input.GetMouseButtonDown(0) /*&& Currentstate == State.Aiming*/ && currentbulletnumber>0)
+        if (Input.GetMouseButtonDown(0) && isAiming && !isReloading && currentbulletnumber>0 && shotratetimer <=0)
         { 
-        //bulletcase
-        Instantiate(Bulletcaseprefab, Casepoint.position, Quaternion.identity);
+            //bulletcase
+            Instantiate(Bulletcaseprefab, Casepoint.position, Quaternion.identity);
 
-        //bullet
-        Rigidbody rb = Instantiate(Bulletprefab, Firepoint.position, Firepoint.rotation).GetComponent<Rigidbody>();
-        rb.linearVelocity = Firepoint.forward * bulletspeed;
-        BulletcaseNumber++;
-        currentbulletnumber--;
-        Impulse.GenerateImpulse();
+            //bullet
+            Rigidbody rb = Instantiate(Bulletprefab, Firepoint.position, Firepoint.rotation).GetComponent<Rigidbody>();
+            rb.linearVelocity = Firepoint.forward * bulletspeed;
+            BulletcaseNumber++;
+            currentbulletnumber--;
+            Impulse.GenerateImpulse();
+            shotratetimer = shotrate;
         }
+        shotratetimer -= Time.deltaTime;
 
-    }
-
-    public void ResetShooingbool()
-    {
-        Animator.SetBool("Shooting", false);
-        Currentstate = State.Aiming;
-        Animator.SetBool("isCharging", false);
     }
 
     public void HandleRunningAnimation()
     {
-        if (Input.GetKey(KeyCode.W)|| Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
         {
-            T += 10f * Time.deltaTime;
-            T = Mathf.Clamp01(T);
-            Animator.SetFloat("RunningSpeed",Mathf.Lerp(0,1,T));
-
             if (Input.GetKey(KeyCode.LeftShift))
             {
-                Animator.SetFloat("RunningSpeed", Mathf.Lerp(0, 2, T));
+                targetspeed = 2f;
+            }
+            else
+            {
+                targetspeed = 1f;
             }
         }
         else
         {
-            T = 0;
+            targetspeed = 0f;
         }
 
+        float current = Animator.GetFloat("RunningSpeed");
+        Animator.SetFloat("RunningSpeed", Mathf.MoveTowards(current, targetspeed, 5f * Time.deltaTime));
+    }
 
+    public void DetectEnemy()
+    {
+
+
+        
 
     }
 }
