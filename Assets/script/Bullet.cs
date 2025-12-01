@@ -7,8 +7,9 @@ public class Bullet : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
 
-        Instantiate(testcube, gameObject.transform.position, Quaternion.identity);
+        //Instantiate(testcube, gameObject.transform.position, Quaternion.identity);
         Destroy(gameObject);
+
 
     }
 

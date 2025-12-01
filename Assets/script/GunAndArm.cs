@@ -39,7 +39,11 @@ public class GunAndArm : MonoBehaviour
 
     //Hitchcock
     private bool isPointingEnemy;
-    
+    RaycastHit hit;
+    private float targetHitchcock;
+    private float Hitchcockchangerate;
+    public CinemachineImpulseSource trumble;
+
 
     private void Start()
     {
@@ -50,6 +54,7 @@ public class GunAndArm : MonoBehaviour
     public void Update()
     {
         Aim();
+        DetectEnemy();
         Reload();
         Fire();
         HandleRunningAnimation();
@@ -57,7 +62,7 @@ public class GunAndArm : MonoBehaviour
 
     public void Reload()
     {
-        if (Input.GetKeyDown(KeyCode.R) && !isReloading)
+        if (Input.GetKeyDown(KeyCode.R) && !isReloading && currentbulletnumber < bulletnumber)
         {
             Animator.SetBool("isReloading", true);
             currentbulletnumber = bulletnumber;
@@ -76,7 +81,7 @@ public class GunAndArm : MonoBehaviour
         if(Input.GetMouseButton(1)&& !isReloading)
         {
             charger += Time.deltaTime *10f;
-            DetectEnemy();
+
             isAiming = true;
         }
         else
@@ -133,9 +138,29 @@ public class GunAndArm : MonoBehaviour
 
     public void DetectEnemy()
     {
+        if (Input.GetMouseButton(1))
+        {
+            if(Physics.Raycast(Firepoint.position, Firepoint.forward, out hit, 300f) && hit.collider.CompareTag("Enemy"))
+            {
+                targetHitchcock = 1;
+                Hitchcockchangerate = 0.2f;
+              
 
+            }
+            else
+            {
+                targetHitchcock = -0.1f;
+                Hitchcockchangerate = 0.8f;
+            }
+        }
+        else
+        {
+            targetHitchcock = -0.2f;
+            Hitchcockchangerate = 3f;
+        }
 
-        
-
+        float current = Animator.GetFloat("HitchCock");
+        Animator.SetFloat("HitchCock", Mathf.MoveTowards(current, targetHitchcock, Hitchcockchangerate * Time.deltaTime));
+        if (current>=0) trumble.GenerateImpulse();
     }
 }
