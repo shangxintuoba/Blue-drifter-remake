@@ -140,7 +140,7 @@ public class GunAndArm : MonoBehaviour
     {
         if (Input.GetMouseButton(1))
         {
-            if(Physics.Raycast(Firepoint.position, Firepoint.forward, out hit, 300f) && hit.collider.CompareTag("Enemy"))
+            if(Physics.Raycast(Firepoint.position, Firepoint.forward, out hit, 200f) && hit.collider.CompareTag("Enemy"))
             {
                 targetHitchcock = 1;
                 Hitchcockchangerate = 0.2f;
