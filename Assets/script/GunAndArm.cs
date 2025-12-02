@@ -23,13 +23,15 @@ public class GunAndArm : MonoBehaviour
     //bulletcase count 
     public int BulletcaseNumber =0;
 
-    //cameara shake
+    //Fire effect
     public CinemachineImpulseSource Impulse;
+    public ParticleSystem ParticleSystem;
 
     //Aim Charger
     private float charger = 0;
 
     public Animator Animator;
+
     //run animation lerp timer
     private float targetspeed =0;
 
@@ -108,6 +110,7 @@ public class GunAndArm : MonoBehaviour
             BulletcaseNumber++;
             currentbulletnumber--;
             Impulse.GenerateImpulse();
+            ParticleSystem.Play();
             shotratetimer = shotrate;
         }
         shotratetimer -= Time.deltaTime;
@@ -149,13 +152,13 @@ public class GunAndArm : MonoBehaviour
             }
             else
             {
-                targetHitchcock = -0.1f;
+                targetHitchcock = 0f;
                 Hitchcockchangerate = 0.8f;
             }
         }
         else
         {
-            targetHitchcock = -0.2f;
+            targetHitchcock = 0f;
             Hitchcockchangerate = 3f;
         }
 
