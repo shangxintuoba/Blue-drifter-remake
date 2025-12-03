@@ -164,6 +164,6 @@ public class GunAndArm : MonoBehaviour
 
         float current = Animator.GetFloat("HitchCock");
         Animator.SetFloat("HitchCock", Mathf.MoveTowards(current, targetHitchcock, Hitchcockchangerate * Time.deltaTime));
-        if (current>=0) trumble.GenerateImpulse();
+        if (current>=0.1f) trumble.GenerateImpulse();
     }
 }
