@@ -4,6 +4,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     public GameObject Spark;
+    public GameObject Blood;
 
 
     private void OnCollisionEnter(Collision collision)
@@ -14,7 +15,7 @@ public class Bullet : MonoBehaviour
         }
         else if (collision.collider.CompareTag("Enemy"))
         {
-            Instantiate(Spark, gameObject.transform.position, gameObject.transform.rotation);
+            Instantiate(Blood, gameObject.transform.position, gameObject.transform.rotation);
         }
 
         Destroy(gameObject);
