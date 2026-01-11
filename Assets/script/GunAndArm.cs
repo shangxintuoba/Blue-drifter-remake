@@ -47,6 +47,9 @@ public class GunAndArm : MonoBehaviour
     public CinemachineImpulseSource trumble;
 
 
+    //scanner
+    public bool isScannerModeOn;
+
     private void Start()
     {
         currentbulletnumber = bulletnumber;
@@ -60,6 +63,7 @@ public class GunAndArm : MonoBehaviour
         Reload();
         Fire();
         HandleRunningAnimation();
+        ScannerModeToggle();
     }
 
     public void Reload()
@@ -80,7 +84,7 @@ public class GunAndArm : MonoBehaviour
 
     public void Aim()
     {
-        if(Input.GetMouseButton(1)&& !isReloading)
+        if(Input.GetMouseButton(1)&& !isReloading && !isScannerModeOn)
         {
             charger += Time.deltaTime *10f;
 
@@ -166,4 +170,21 @@ public class GunAndArm : MonoBehaviour
         Animator.SetFloat("HitchCock", Mathf.MoveTowards(current, targetHitchcock, Hitchcockchangerate * Time.deltaTime));
         if (current>=0.1f) trumble.GenerateImpulse();
     }
+
+
+    void ScannerModeToggle()
+    {
+        if (Input.GetKeyDown(KeyCode.Q)) 
+        {
+            if (!isScannerModeOn)
+            {
+                isScannerModeOn = true;
+            }
+            else 
+            {
+                isScannerModeOn = false;
+            }
+        }
+    }
+
 }

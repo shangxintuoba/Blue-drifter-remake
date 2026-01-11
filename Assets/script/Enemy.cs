@@ -1,9 +1,11 @@
+using TMPro;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-
+    public GunAndArm GunAndArm;
     public GameObject Player;
+    public TextMeshProUGUI Name;
 
     public enum State
     {
@@ -13,7 +15,6 @@ public class Enemy : MonoBehaviour
     }
 
     public State EnemyState = State.Wandering;
-
 
     public void Update()
     {
@@ -34,12 +35,9 @@ public class Enemy : MonoBehaviour
 
     }
 
-
-
-
     private void Wander()
     {
-       
+       //wandering around in a given range
 
     }
 
@@ -54,4 +52,18 @@ public class Enemy : MonoBehaviour
 
 
     }
+
+
+
+
+    void Showscannednames()
+    {
+        if (GunAndArm.isScannerModeOn)
+        {
+            //add a function here to detect if the players camera is pointing at the enemy's body 
+            Name.gameObject.SetActive(true);
+        }
+
+    }
+
 }
