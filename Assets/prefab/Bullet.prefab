@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 1957514508529321854}
   m_Layer: 0
   m_Name: Bullet
-  m_TagString: Untagged
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -127,6 +127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Spark: {fileID: 4953272254550281470, guid: 55f4271750cd7f848b48b6a1a7028ed6, type: 3}
   Blood: {fileID: 4953272254550281470, guid: da963ce88e0aa924f88d7222a717b6c9, type: 3}
+  Damage: 10
 --- !u!54 &7374868582222446605
 Rigidbody:
   m_ObjectHideFlags: 0

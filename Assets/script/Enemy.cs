@@ -7,6 +7,18 @@ public class Enemy : MonoBehaviour
     public GameObject Player;
     public TextMeshProUGUI Name;
 
+    public Animator EnemyAnimator;
+
+
+    //Wandering
+    private float WanderRange;
+
+
+    //Chase and shot
+    private float SearchRange;
+    private float ShotRange;
+
+
     public enum State
     {
         Wandering,
@@ -54,6 +66,11 @@ public class Enemy : MonoBehaviour
     }
 
 
+    void EnemyStateCOntrol()
+    {
+
+
+    }
 
 
     void Showscannednames()

@@ -12,6 +12,7 @@ public class Bullet : MonoBehaviour
         if (collision.collider.CompareTag("Wall"))
         {
             Instantiate(Spark, gameObject.transform.position, gameObject.transform.rotation);
+
         }
         else if (collision.collider.CompareTag("Enemy"))
         {
