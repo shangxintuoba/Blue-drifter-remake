@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class Healthsystem : MonoBehaviour
+public class PlayerHealthsystem : MonoBehaviour
 {
     public float Maxhealth =100f;
     public float Health;
@@ -57,7 +57,7 @@ public class Healthsystem : MonoBehaviour
 
     void FallingToWater()
     {
-        if (transform.position.y <= -5f)            
+        if (transform.position.y <= -30f)            
         { 
             Health = 0;
             return;

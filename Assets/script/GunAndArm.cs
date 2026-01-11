@@ -6,6 +6,8 @@ using Cinemachine;
 
 public class GunAndArm : MonoBehaviour
 {
+
+    [Header("Reference")]
     public Bulletcase Bulletcaseprefab;
     public Bullet Bulletprefab;
     
@@ -13,6 +15,7 @@ public class GunAndArm : MonoBehaviour
     public Transform Casepoint;
 
 
+    [Header("Bullet")]
     public int bulletnumber = 12;
     private int currentbulletnumber;
 
@@ -23,11 +26,12 @@ public class GunAndArm : MonoBehaviour
     //bulletcase count 
     public int BulletcaseNumber =0;
 
-    //Fire effect
+
+    [Header("Fire effect")]
     public CinemachineImpulseSource Impulse;
     public ParticleSystem ParticleSystem;
 
-    //Aim Charger
+    [Header("Other")]
     private float charger = 0;
 
     public Animator Animator;
@@ -47,7 +51,7 @@ public class GunAndArm : MonoBehaviour
     public CinemachineImpulseSource trumble;
 
 
-    //scanner
+    [Header("Scanner")]
     public bool isScannerModeOn;
 
     private void Start()
@@ -151,8 +155,6 @@ public class GunAndArm : MonoBehaviour
             {
                 targetHitchcock = 1;
                 Hitchcockchangerate = 0.2f;
-              
-
             }
             else
             {
@@ -185,6 +187,15 @@ public class GunAndArm : MonoBehaviour
                 isScannerModeOn = false;
             }
         }
+    }
+
+    void Scann()
+    {
+        if (Physics.Raycast(Firepoint.position, Firepoint.forward, out hit, 200f) && hit.collider.CompareTag("Enemy"))
+        {
+
+        }
+
     }
 
 }

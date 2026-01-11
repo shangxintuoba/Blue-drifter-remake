@@ -14,7 +14,7 @@ public class Bullet : MonoBehaviour
             Instantiate(Spark, gameObject.transform.position, gameObject.transform.rotation);
 
         }
-        else if (collision.collider.CompareTag("Enemy"))
+        else if (collision.collider.CompareTag("Enemy")|| collision.collider.CompareTag("Player"))
         {
             Instantiate(Blood, gameObject.transform.position, gameObject.transform.rotation);
         }
