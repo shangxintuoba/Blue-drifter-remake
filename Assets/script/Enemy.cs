@@ -1,5 +1,6 @@
 using System.Collections;
 using TMPro;
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -20,15 +21,27 @@ public class Enemy : MonoBehaviour
     private Rigidbody rb;
 
 
-    //Chase and shot
-    private float SearchRange;
-    private float ShotRange;
+    [Header("Chase and Shoot")]
+    public float ShotRange =25f;
+    public float ChasingRange =10f;
 
     [Header("health")]
     public float Maxhealth = 100f;
     public float Health;
-    public float BulletDamage;
+    public float BulletDamage = 20f;
     float distanceToPlayer;
+    public Collider HitboxCollider;
+    public GameObject Blood;
+
+    [Header("Fire")]
+    public Transform Firepoint;
+    public Bullet EnemyBullet;
+    public float FireRate;
+    private float Firetimer;
+    public float Fireinterval =1;
+    public GameObject FireModeArm;
+    public GameObject LA;
+    public GameObject RA;
 
     public enum State
     {
@@ -43,11 +56,14 @@ public class Enemy : MonoBehaviour
     private void Start()
     {
         rb =GetComponent<Rigidbody>();
+        Health = Maxhealth;
         Initialposition = transform.position;
     }
 
     public void Update()
     {
+        EnemyStateControl();
+
         switch (EnemyState)
         {
             case State.Wandering:
@@ -56,46 +72,45 @@ public class Enemy : MonoBehaviour
             case State.Alterted:
                 Wander();
                 break;
-
-            case State.Chasing:
-                Chase();
-                break;
-
             case State.Shooting:
                 Shoot();
                 break;
         }
+
+        HandleHealth();
     }
 
     void EnemyStateControl()
     {
         distanceToPlayer = Vector3.Distance(transform.position, Player.transform.position);
 
-        // Trigger alert 
-        if (Health < 100 && EnemyState == State.Wandering)
-        {
-            EnemyState = State.Chasing;
-            return;
-        }
-
-        // Enter shooting range
-        if (distanceToPlayer <= ShotRange)
-        {
-            EnemyState = State.Shooting;
-            return;
-        }
-
-        // Chasing player
-        if (distanceToPlayer <= SearchRange && distanceToPlayer > ShotRange)
-        {
-            EnemyState = State.Chasing;
-            return;
-        }
-
-        // Lost player and alerted
-        if (distanceToPlayer > SearchRange)
+        // Wander > alert
+        if ( EnemyState == State.Wandering && Health < 100)
         {
             EnemyState = State.Alterted;
+            FireModeArm.SetActive(false);
+            LA.SetActive(true);
+            RA.SetActive(true);
+            return;
+        }
+
+        // Shot> alerted
+        if (EnemyState == State.Shooting && distanceToPlayer > ShotRange)
+        {
+            EnemyState = State.Alterted;
+            FireModeArm.SetActive(false);
+            LA.SetActive(true);
+            RA.SetActive(true);
+            return;
+        }
+
+        //alter > shoot
+        if(EnemyState == State.Alterted && distanceToPlayer <= ShotRange)
+        {
+            EnemyState = State.Shooting;
+            FireModeArm.SetActive(true);
+            LA.SetActive(false);
+            RA.SetActive(false);
             return;
         }
     }
@@ -126,7 +141,7 @@ public class Enemy : MonoBehaviour
             hasWanderTarget = true;
         }
         else 
-        { 
+        {
             //rotate
             Vector3 direction = wanderTarget - transform.position;
             direction.y = 0f;
@@ -160,11 +175,63 @@ public class Enemy : MonoBehaviour
 
     private void Shoot()
     {
+        //facing player
+        Vector3 direction = Player.transform.position - transform.position;
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation,
+                targetRotation,
+                360f * Time.deltaTime
+            );
+        }
+
+        Firetimer += Time.deltaTime;
+        
+        //shoot
+        if (Firetimer >= Fireinterval)
+        { 
+            Rigidbody rb = Instantiate(EnemyBullet, Firepoint.position, Firepoint.rotation).GetComponent<Rigidbody>();
+            Vector3 shootDirection = (Player.transform.position - Firepoint.position).normalized;
+            rb.linearVelocity = shootDirection * 200f;
+            Firetimer = 0;
+        }
+
+        //Chase
+        if(distanceToPlayer <= ShotRange && distanceToPlayer >= ChasingRange)
+        {
+            Chase(Player.transform.position);
+        }
+    }
+
+    private void Chase(Vector3 Target)
+    {
+        //rotate
+        Vector3 direction = Target - transform.position;
+        direction.y = 0f;
+        float rotationSpeed = 180f;
+
+        if (direction.sqrMagnitude > 1f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+
+        //move
+        if (Vector3.Distance(transform.position, wanderTarget) >= 1f)
+        {
+            rb.MovePosition(rb.position + direction.normalized * WanderSpeed * Time.deltaTime);
+        }
 
     }
-    private void Chase()
-    {
 
+    void HandleHealth()
+    {
+        if (Health <= 0) 
+        { Destroy(gameObject); }
 
     }
 
@@ -174,7 +241,9 @@ public class Enemy : MonoBehaviour
     {
         if (other.CompareTag("Bullet"))
         {
+            Debug.Log("EnemyGetHit");
             TakeDamage(BulletDamage);
+            Instantiate(Blood, other.transform.position, other.transform.rotation);
         }
 
     }

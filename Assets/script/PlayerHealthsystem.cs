@@ -17,31 +17,37 @@ public class PlayerHealthsystem : MonoBehaviour
     public Bullet Bullet;
     public float BulletDamage;
 
+    private float Healthtimer;
+    private float HealthGenerateinterval = 5f;
+   
+
     private void Start()
     {   
         Health = Maxhealth; 
-
     }
 
 
     private void Update()
     {
         HandlerHealthfilter();
+        HealthRegenerate();
         FallingToWater();
         DeathandRespawn();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Bullet"))
+        if (other.CompareTag("EnemyBullet"))
         {
             TakeDamage(BulletDamage);
+
         }
     }
 
     void TakeDamage(float amount)
     {
         Health -= amount;
+        Healthtimer = 0;
         Health = Mathf.Clamp(Health, 0f, Maxhealth);
     }
 
@@ -53,6 +59,17 @@ public class PlayerHealthsystem : MonoBehaviour
             healthfilter.color = Color.Lerp(healthycolor,Deathcolor,healthLossPercent);
         }
 
+    }
+
+    void HealthRegenerate()
+    {
+        Healthtimer += Time.deltaTime;
+
+        if (Healthtimer >= HealthGenerateinterval )
+        {
+            Health += Time.deltaTime * 5f;
+            Health = Mathf.Clamp(Health, 0f, Maxhealth);
+        }
     }
 
     void FallingToWater()

@@ -7,6 +7,8 @@ public class Bullet : MonoBehaviour
     public GameObject Blood;
 
 
+
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.CompareTag("Wall"))
@@ -14,12 +16,16 @@ public class Bullet : MonoBehaviour
             Instantiate(Spark, gameObject.transform.position, gameObject.transform.rotation);
 
         }
-        else if (collision.collider.CompareTag("Enemy")|| collision.collider.CompareTag("Player"))
-        {
-            Instantiate(Blood, gameObject.transform.position, gameObject.transform.rotation);
-        }
-
         Destroy(gameObject);
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Enemy"))
+        { 
+            Instantiate(Blood, gameObject.transform.position, gameObject.transform.rotation);
+        }
+    }
+
 
 }
