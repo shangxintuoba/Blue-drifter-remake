@@ -173,6 +173,34 @@ public class Enemy : MonoBehaviour
         hasWanderTarget = false;
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.CompareTag("Wall"))
+        {
+            ContactPoint contact = collision.contacts[0];
+            Vector3 wallNormal = contact.normal;
+
+            RegenerateWanderTargetOpposite(wallNormal);
+        }
+    }
+
+    void RegenerateWanderTargetOpposite(Vector3 wallNormal)
+    {
+        // Push away from wall
+        Vector3 oppositeDirection = Vector3.Reflect(transform.forward, wallNormal);
+        oppositeDirection.y = 0f;
+
+        float distance = Random.Range(5f, WanderRange);
+
+        wanderTarget = transform.position + oppositeDirection.normalized * distance;
+        wanderTarget.y = Initialposition.y;
+
+        hasWanderTarget = true;
+
+        StopAllCoroutines(); // stop waiting coroutine if any
+    }
+
+
     private void Shoot()
     {
         //facing player

@@ -11,7 +11,7 @@ public class Bullet : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.collider.CompareTag("Wall"))
+        if (collision.collider.CompareTag("Wall")|| collision.collider.CompareTag("Floor"))
         {
             Instantiate(Spark, gameObject.transform.position, gameObject.transform.rotation);
 

@@ -2,15 +2,26 @@ using UnityEngine;
 
 public class Gamemanager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public Enemy[] enemies;
+    public enum State
     {
-        
+        Wandering,
+        Fighting,
     }
 
-    // Update is called once per frame
-    void Update()
+    public State EnemyState = State.Wandering;
+
+    void Start()
+    {
+        Audiomanager.Instance.PlayBGMLoop(Audiomanager.Instance.BGM);
+    }
+
+    private void Update()
     {
         
+
+
+
     }
+
 }

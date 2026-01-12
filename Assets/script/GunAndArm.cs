@@ -3,6 +3,8 @@ using System.Net;
 using Unity.VisualScripting;
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.Rendering;
+using TMPro;
 
 public class GunAndArm : MonoBehaviour
 {
@@ -53,6 +55,13 @@ public class GunAndArm : MonoBehaviour
 
     [Header("Scanner")]
     public bool isScannerModeOn;
+    public GameObject Scannerfilter;
+    public GameObject Arm;
+    public GameObject Gun;
+    private float Scantimer;
+    private float scantime =2f;
+    public TextMeshProUGUI Indicator;
+
 
     private void Start()
     {
@@ -68,6 +77,7 @@ public class GunAndArm : MonoBehaviour
         Fire();
         HandleRunningAnimation();
         ScannerModeToggle();
+        Scan();
     }
 
     public void Reload()
@@ -77,6 +87,7 @@ public class GunAndArm : MonoBehaviour
             Animator.SetBool("isReloading", true);
             currentbulletnumber = bulletnumber;
             isReloading =true;
+            Audiomanager.Instance.PlayReload();
         }
     }
 
@@ -120,6 +131,7 @@ public class GunAndArm : MonoBehaviour
             Impulse.GenerateImpulse();
             ParticleSystem.Play();
             shotratetimer = shotrate;
+            Audiomanager.Instance.PlayGunshot();
         }
         shotratetimer -= Time.deltaTime;
 
@@ -181,18 +193,44 @@ public class GunAndArm : MonoBehaviour
             if (!isScannerModeOn)
             {
                 isScannerModeOn = true;
+                Animator.SetBool("isScannerModeOn", true);
+                Scannerfilter.SetActive(true);
+                Arm.SetActive(false);
+                Gun.SetActive(false);
+                Audiomanager.Instance.PlayScaner();
+
             }
             else 
             {
                 isScannerModeOn = false;
+                Animator.SetBool("isScannerModeOn", false);
+                Scannerfilter.SetActive(false);
+                Arm.SetActive(true);
+                Gun.SetActive(true);
             }
         }
     }
 
-    void Scann()
+    void Scan()
     {
-        if (Physics.Raycast(Firepoint.position, Firepoint.forward, out hit, 200f) && hit.collider.CompareTag("Enemy"))
+        if (isScannerModeOn)
         {
+            if (Physics.Raycast(gameObject.transform.position, gameObject.transform.forward, out hit, 200f) && hit.collider.CompareTag("Enemy"))
+            {
+                Enemy enemy = hit.collider.GetComponentInParent<Enemy>();
+                Scantimer += Time.deltaTime;
+
+                if (Scantimer >= scantime)
+                {
+                    enemy.Name.gameObject.SetActive(true);
+                }
+            }
+            else 
+            {
+                Scantimer = 0;
+            }
+            float scanPercent = Mathf.Clamp01(Scantimer / scantime);
+            Indicator.text = Mathf.RoundToInt(scanPercent * 100f) + "%";
 
         }
 
